@@ -168,107 +168,202 @@ groupBy(func: RDD元素类型=> K):按照指定字段分组 ******
 groupBy后续是按照函数返回值进行分组
 groupBy会产生shuffle操作
 
+#### 3.1 .7 filter 
 
+filter(func: RDD元素类型=> Boolean ): 过滤 ******
+filter是保留函数返回值为true的数据
 
-​				3.1 .1filter(func: RDD元素类型=> Boolean ): 过滤 ******
-​					filter是保留函数返回值为true的数据
-​				3.1 .1sample(withReplacement,fraction): 采样【一般用于数据倾斜场景】******
-​					withReplacement: 采样之后是否放回[true:放回,代表同一个元素可能被多次采样. false: 不放回,代表同一个元素最多被采样一次]【工作中一般设置为false】
-​					3.1 .1fraction:
-​						withReplacement=true,代表元素期望被采样的次数[>0]
-​						withReplacement=false,代表每个元素被采样的概率[0,1] 【工作中一般设置0.1-0.2】
-​				3.1 .1coalesce(maxPartitions,shuffle=false): 合并分区 ******
-​					coalesce默认只能减少分区数,默认是没有shuffle操作的
-​					coalesce如果想要增大分区，需要设置shuffle=true,此时会产生shuffle操作
-​					coalesce工作中一般搭配filter使用
-​				3.1 .1repartition(maxPartitions): 重分区 ******
-​					repartition既可以增大分区也可以减少分区,都会产生shuffle
-​					repartition底层就是使用的coalesce: coalesce(maxPartitions,shuffle=true)
-​					coalesce与repartition的区别:
-​						coalesce默认只能减少分区数,默认情况下没有shuffle
-​						repartition既可以增大分区也可以减少分区,都有shuffle
-​					如果想要减少分区推荐使用coalesce,因为不用shuffle
-​					如果想要增大分区推荐使用repartition,因为简单
-​				sortBy(func: RDD元素类型 => K,ascding=true ): 按照指定字段排序 ******
-​					sortBy后续是按照函数返回值进行排序
-​					可以通过ascding参数控制升降序
-​					sortBy也会产生shuffle操作
-​				pipe(脚本路径): 调用外部脚本
-​					pipe是每个分区调用一次脚本
-​					pipe会生成一个新的RDD,新RDD的元素是在脚本中通过echo返回的
-​				intersection: 交集
-​					intersection会产生shuffle操作
-​				union: 并集
-​					union没有shuffle操作
-​					union产生的RDD的分区数 = union的两个RDD的分区数的总和
-​				substract: 差集
-​					substract会产生shuffle操作
-​				zip: 拉链
-​					两个RDD想要拉链必须分区数以及元素个数一致
-​				flatMap(func: RDD元素类型=> 集合 ) = map+ flatten  ******
-​					map里面的函数是针对RDD每个元素进行操作,操作完成之后返回一个集合
-​					flatMap生成的新的RDD的元素的个数>=原RDD元素个数
-​				partitionBy(partitioner): 根据指定分区器重新分区
-​				自定义分区器:
-​					1.定义class继承partitioner
+#### 3.1 .8 sample 
+
+sample(withReplacement,fraction): 采样【一般用于数据倾斜场景】******
+withReplacement: 采样之后是否放回[true:放回,代表同一个元素可能被多次采样. false: 不放回,代表同一个元素最多被采样一次]【工作中一般设置为false】
+
+#### 3.1 .9 fraction 
+
+fraction:
+withReplacement=true,代表元素期望被采样的次数[>0]
+withReplacement=false,代表每个元素被采样的概率[0,1] 【工作中一般设置0.1-0.2】
+
+#### 3.1 .10 coalesce 
+
+coalesce(maxPartitions,shuffle=false): 合并分区 ******
+coalesce默认只能减少分区数,默认是没有shuffle操作的
+coalesce如果想要增大分区，需要设置shuffle=true,此时会产生shuffle操作
+coalesce工作中一般搭配filter使用
+
+#### 3.1 .11 repartition 
+
+repartition(maxPartitions): 重分区 ******
+repartition既可以增大分区也可以减少分区,都会产生shuffle
+repartition底层就是使用的coalesce: coalesce(maxPartitions,shuffle=true)
+
+**coalesce与repartition的区别:**
+coalesce默认只能减少分区数,默认情况下没有shuffle
+repartition既可以增大分区也可以减少分区,都有shuffle
+如果想要减少分区推荐使用coalesce,因为不用shuffle
+如果想要增大分区推荐使用repartition,因为简单
+
+#### 3.1 .12 sortBy 
+
+sortBy(func: RDD元素类型 => K,ascding=true ): 按照指定字段排序 ******
+sortBy后续是按照函数返回值进行排序
+可以通过ascding参数控制升降序
+sortBy也会产生shuffle操作
+
+#### 3.1 .13 pipe				
+
+pipe(脚本路径): 调用外部脚本
+pipe是每个分区调用一次脚本
+pipe会生成一个新的RDD,新RDD的元素是在脚本中通过echo返回的
+​				
+
+#### 3.1 .14 intersection: 交集
+
+intersection会产生shuffle操作
+
+#### 3.1 .15 union: 并集
+
+union没有shuffle操作
+union产生的RDD的分区数 = union的两个RDD的分区数的总和
+				
+
+#### 3.1 .16 substract: 差集
+
+substract会产生shuffle操作
+
+#### 3.1 .17 zip: 拉链
+
+两个RDD想要拉链必须分区数以及元素个数一致
+
+#### 3.1 .18 flatMap
+
+flatMap(func: RDD元素类型=> 集合 ) = map+ flatten  ******
+map里面的函数是针对RDD每个元素进行操作,操作完成之后返回一个集合
+flatMap生成的新的RDD的元素的个数>=原RDD元素个数
+
+#### 3.1 .19 partitionBy 
+
+partitionBy(partitioner): 根据指定分区器重新分区
+自定义分区器:
+					1.定义class继承partitioner
 ​					2.重写抽象方法
 ​					3.创建自定义分区器对象,在shuffle算子中直接使用即可
-​				reduceByKey(func: (Value类型,Value类型) => Value类型 )：根据key进行分组聚合 ******
-​					reduceByKey里面的函数是针对每个组所有的value值进行聚合
-​					reduceByKey里面的函数用于combiner以及reduce阶段
-​				groupByKey: 直接根据key分组 ******
-​				reduceByKey与groupByKey的区别: ******
-​					reduceByKey有类似MR的combiner预聚合功能
-​					groupByKey只是单纯的分组,没有类似MR的combiner预聚合功能,整体性能上要比reduceByKey要低
-​				aggregateByKey(初始值:U)(seqOp:(U,value值类型)=>U,comOp: (U,U)=>U ): 根据key进行分组聚合
-​					seqOp是combiner聚合逻辑
-​					comOp是reduce聚合逻辑
-​					初始值是seqOp函数在针对每个分组第一次聚合的时候,第一个参数的值 = 初始值
-​				foldByKey(初始值:value值类型)(func:  (Value类型,Value类型) => Value类型 ): 根据key进行分组聚合
-​					foldByKey里面的函数用于combiner以及reduce阶段
-​					combiner计算阶段在每个组第一次聚合的时候,函数第一个参数的值 = 初始值
-​				combineByKey(createCombine: value值类型 => B ,mergeValue: (B,value值类型)=>B ,mergeCombine: (B,B)=>B)
-​					createCombine: 是在combiner阶段对每个组的第一个value值进行转换
-​					mergeValue: combiner执行逻辑
+
+#### 3.1 .20 reduceByKey				
+
+reduceByKey(func: (Value类型,Value类型) => Value类型 )：根据key进行分组聚合 ******
+					reduceByKey里面的函数是针对每个组所有的value值进行聚合
+					reduceByKey里面的函数用于combiner以及reduce阶段
+
+#### 3.1 .21 groupByKey
+
+groupByKey: 直接根据key分组 ******
+
+reduceByKey与groupByKey的区别: ******
+​reduceByKey有类似MR的combiner预聚合功能
+​groupByKey只是单纯的分组,没有类似MR的combiner预聚合功能,整体性能上要比reduceByKey要低
+​				
+
+#### 3.1 .22 aggregateByKey 
+
+aggregateByKey(初始值:U)(seqOp:(U,value值类型)=>U,comOp: (U,U)=>U ): 根据key进行分组聚合
+					seqOp是combiner聚合逻辑
+					comOp是reduce聚合逻辑
+初始值是seqOp函数在针对每个分组第一次聚合的时候,第一个参数的值 = 初始值
+
+#### 3.1 .23 foldByKey
+
+foldByKey(初始值:value值类型)(func:  (Value类型,Value类型) => Value类型 ): 根据key进行分组聚合
+					foldByKey里面的函数用于combiner以及reduce阶段
+					combiner计算阶段在每个组第一次聚合的时候,函数第一个参数的值 = 初始值
+
+#### 3.1 .24 combineByKey 
+
+combineByKey(createCombine: value值类型 => B ,mergeValue: (B,value值类型)=>B ,mergeCombine: (B,B)=>B)
+					createCombine: 是在combiner阶段对每个组的第一个value值进行转换
+					mergeValue: combiner执行逻辑
 ​					mergeCombine： reduce聚合逻辑
-​				reduceByKey.aggregateByKey.foldByKey.combineByKey的区别:
+
+#### 3.1 .25 reduceByKey.aggregateByKey.foldByKey.combineByKey的区别:
+
 ​					reduceByKey.foldByKey: combiner与reduce计算逻辑完全一样
 ​					aggregateByKey.combineByKey: combiner与reduce计算逻辑可以不一样
 ​					foldByKey.aggregateByKey: combiner计算阶段对每个组第一次聚合的时候,combiner函数第一个参数的值 = 初始值
 ​					reduceByKey.combineByKey: combiner计算阶段对每个组第一次聚合的时候,combiner函数第一个参数的值 = 每个组的第一个value值
-​				sortByKey： 根据key排序  ******
-​				mapValues(func: value值类型 => B ): 针对value值进行转换[类型的转换.值的转换]
+
+#### 3.1 .26 sortByKey
+
+sortByKey： 根据key排序  
+				mapValues(func: value值类型 => B ): 针对value值进行转换[类型的转换.值的转换]
 ​					mapValues里面的函数是针对每个元素的value值进行操作
 ​				join: 两个rdd的key相同的时候才能连接上
 ​					val rdd3:RDD[(key,(rdd1的value值,rdd2的value值))] = rdd1.join(rdd2)
 ​				leftOuterJoin: 两个rdd的key相同的时候才能连接上 + 左RDD不能连接上的数据
 ​				rightOuterJoin: 两个rdd的key相同的时候才能连接上 + 右RDD不能连接上的数据
 ​				fullOuterJoin: 两个rdd的key相同的时候才能连接上 + 左RDD不能连接上的数据 + 右RDD不能连接上的数据
-​				cogroup: 类似全连接+ 分组
-​					cogroup的结果: RDD[(key,(左RDD key对应的所有value值,右RDD key对应的所有value值))]
-​			2.行动算子: 触发job的执行
+cogroup: 类似全连接+ 分组
+cogroup的结果: RDD[(key,(左RDD key对应的所有value值,右RDD key对应的所有value值))]
+
+### 3.2  行动算子: 触发job的执行
+
+#### 3.2.1 reduce
+
 ​				reduce(func: (RDD元素类型,RDD元素类型)=>RDD元素类型): 对RDD所有元素聚合
-​				collect:  收集RDD每个分区的数据返回给Driver ******
-​					如果RDD的数据量比较大,Driver默认内存只有1G,所以可能会导致Driver的内存溢出。工作中一般需要配置Driver的内存为5-10G【通过--driver-memory】
-​				count: 统计RDD元素个数
+
+#### 3.2.2 collect
+
+ 				collect:  收集RDD每个分区的数据返回给Driver ******
+如果RDD的数据量比较大,Driver默认内存只有1G,所以可能会导致Driver的内存溢出。工作中一般需要配置Driver的内存为5-10G【通过--driver-memory】
+
+#### 3.2.3  count				
+
+count: 统计RDD元素个数
+
+#### 3.2.4 first
+
 ​				first: 获取RDD第一个元素
+
+#### 3.2.5 take
+
 ​				take: 获取RDD前N个元素
+
+#### 3.2.6 takeOrdered
+
 ​				takeOrdered: 对RDD元素排序之后获取前N个
-​				aggregate(初始值:U)(seqOp:(U,RDD元素类型)=>U,comOp: (U,U)=>U)： 对RDD所有元素聚合
-​					初始值可以用于seqOp.comOp函数的第一次计算
-​				fold(初始值:RDD元素类型)(func: (RDD元素类型,RDD元素类型)=>RDD元素类型)： 对RDD所有元素聚合
+
+#### 3.2.7 aggregate
+
+aggregate(初始值:U)(seqOp:(U,RDD元素类型)=>U,comOp: (U,U)=>U)： 对RDD所有元素聚合
+初始值可以用于seqOp.comOp函数的第一次计算
+
+#### 3.2.8 fold
+
+fold(初始值:RDD元素类型)(func: (RDD元素类型,RDD元素类型)=>RDD元素类型)： 对RDD所有元素聚合
+
+#### 3.2.9 countByKey
+
 ​				countByKey: 统计key出现的次数  ******
-​					countByKey一般是结合sample用于数据倾斜场景
-​				save:
-​					saveAsTextFile() : 数据保存到文件中
-​				foreach(func: RDD元素类型 => Unit ):Unit
-​					foreach里面的函数是针对RDD每个元素操作
-​					foreach没有返回值
-​				foreachPartition(func: 迭代器[RDD元素类型]=> Unit):Unit  ******
-​					foreach与foreachPartition的区别:
-​						foreach里面的函数是针对RDD每个元素操作
-​						foreachPartition是针对RDD每个分区的所有数据的迭代器操作
-​			3.RDD序列化
+​				countByKey一般是结合sample用于数据倾斜场景
+
+#### 3.2.10 save				
+
+save: saveAsTextFile() : 数据保存到文件中
+
+#### 3.2.11 foreach			
+
+foreach(func: RDD元素类型 => Unit ):Unit
+foreach里面的函数是针对RDD每个元素操作
+foreach没有返回值
+
+#### 3.2.12 foreachPartition
+
+foreachPartition(func: 迭代器[RDD元素类型]=> Unit):Unit  ******
+foreach与foreachPartition的区别:
+foreach里面的函数是针对RDD每个元素操作
+foreachPartition是针对RDD每个分区的所有数据的迭代器操作
+
+### 3.3  RDD序列化
+
 ​				原因:Spark算子里面函数在Executor中执行,算子外面的代码在Driver中执行,有时候Spark算子里面的函数会用到Driver中的对象,所以需要将对象序列化之后传到Executor中使用
 ​				spark序列化有两种方式: 
 ​					java序列化【spark默认使用】
