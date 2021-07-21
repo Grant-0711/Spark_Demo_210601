@@ -134,3 +134,4 @@ https://www.processon.com/diagraming/60d36a7c5653bb049a4427ec
 ②上述过程需要配置Spark环境变量以及在Hive机器上安装Spark3.0
 
 ③Spark-Job运行模式为YARN，所以需要在HDFS上上传纯净的sparkJar包
+
